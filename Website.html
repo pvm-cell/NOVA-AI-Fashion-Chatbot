@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>NOVA FashionBot Chat</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #1e1e2f, #0a0f1a);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #d5bfff, #ffcef3, #a5e0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.5rem;
+    }
+
+    #chatbox {
+      width: 80%;
+      max-width: 700px;
+      height: 55vh;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg {
+      margin: 10px 0;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      line-height: 1.5;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background: linear-gradient(135deg, #ff9ecf, #ffc0cb);
+      color: black;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .bot {
+      background-color: #79cfff;
+      color: #003344;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+
+    #inputBox {
+      width: 80%;
+      max-width: 700px;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    input {
+      flex: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #555;
+      background-color: #1e1e2f;
+      color: white;
+    }
+
+    button {
+      padding: 0.75rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      background: linear-gradient(to right, #2575fc, #6a11cb);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>NOVA FashionBot Chat</h1>
+
+  <div id="controls">
+    <button onclick="newChat()">New Chat</button>
+    <button onclick="clearChat()">Delete Chat</button>
+  </div>
+
+  <div id="chatbox"></div>
+
+  <div id="inputBox">
+    <input type="text" id="userInput" placeholder="Ask for fashion advice...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById('chatbox');
+
+    function appendMessage(sender, text) {
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + (sender === 'You' ? 'user' : 'bot');
+      msg.textContent = `${sender}: ${text}`;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function clearChat() {
+      chatbox.innerHTML = '';
+    }
+
+    function newChat() {
+      chatbox.innerHTML = '';
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      appendMessage('You', message);
+      input.value = '';
+
+      const res = await fetch('http://127.0.0.1:8001/fashion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      appendMessage('NOVA', data.reply);
+    }
+  </script>
+
+</body>
+
+</html>
